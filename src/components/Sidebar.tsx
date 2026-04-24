@@ -3,6 +3,15 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  Home,
+  Search,
+  Calendar,
+  Heart,
+  Settings,
+  LogOut,
+  Tv,
+} from "lucide-react";
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
@@ -13,72 +22,81 @@ export default function Sidebar() {
     return null;
   }
 
-  return (
-    <aside className="w-64 bg-zinc-950 text-zinc-100 flex flex-col h-screen sticky top-0 border-r border-zinc-800 shadow-2xl">
-      <div className="flex items-center justify-center">
-        <Image
-          src="/nblogo.png"
-          alt="Logo"
-          width={200}
-          height={120}
-          className="h-30 w-auto scale-140"
-        />
-      </div>
+  const isActive = (path: string) => pathname === path;
 
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+  return (
+    <aside className="w-24 bg-black flex flex-col items-center h-screen sticky top-0 border-r border-zinc-800 shadow-2xl py-6 gap-8">
+      {/* Logo */}
+      <Link
+        href="/"
+        className="text-blue-500 hover:text-blue-400 transition-colors"
+      >
+        <Tv size={32} strokeWidth={1.5} />
+      </Link>
+
+      {/* Main Navigation */}
+      <nav className="flex flex-col gap-8 flex-1">
         <Link
           href="/"
-          className="block px-4 py-3 rounded-md transition-colors hover:bg-zinc-800/80 hover:text-white font-medium"
+          className={`p-3 rounded-lg transition-all ${
+            isActive("/")
+              ? "bg-blue-500/20 text-blue-400"
+              : "text-zinc-400 hover:text-blue-400"
+          }`}
+          title="Home"
         >
-          Home
+          <Home size={24} strokeWidth={1.5} />
         </Link>
+
         <Link
           href="/posts"
-          className="block px-4 py-3 rounded-md transition-colors hover:bg-zinc-800/80 hover:text-white font-medium"
+          className={`p-3 rounded-lg transition-all ${
+            isActive("/posts")
+              ? "bg-blue-500/20 text-blue-400"
+              : "text-zinc-400 hover:text-blue-400"
+          }`}
+          title="Posts"
         >
-          Posts
+          <Calendar size={24} strokeWidth={1.5} />
         </Link>
+
         <Link
           href="/api-demo"
-          className="block px-4 py-3 rounded-md transition-colors hover:bg-zinc-800/80 hover:text-white font-medium"
+          className={`p-3 rounded-lg transition-all ${
+            isActive("/api-demo")
+              ? "bg-blue-500/20 text-blue-400"
+              : "text-zinc-400 hover:text-blue-400"
+          }`}
+          title="Explore"
         >
-          API Explorer
+          <Search size={24} strokeWidth={1.5} />
         </Link>
+
+        <button
+          className="p-3 rounded-lg transition-all text-zinc-400 hover:text-pink-400"
+          title="Favorites"
+        >
+          <Heart size={24} strokeWidth={1.5} />
+        </button>
       </nav>
 
-      <div className="p-4 border-t border-zinc-800 bg-zinc-900/50">
-        {user ? (
-          <div>
-            <div className="px-4 py-2 mb-2">
-              <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
-                Account
-              </p>
-              <p className="text-sm font-medium truncate mt-1">
-                {user.user_metadata?.username || user.email || "Admin"}
-              </p>
-            </div>
-            <button
-              onClick={logout}
-              className="w-full text-left px-4 py-2 mt-2 rounded transition-all bg-red-950/30 text-red-400 hover:bg-red-900/50 hover:text-red-300 font-medium"
-            >
-              Log out
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <Link
-              href="/login"
-              className="block w-full text-center px-4 py-2 rounded-md bg-zinc-800 hover:bg-zinc-700 transition-colors font-medium"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/register"
-              className="block w-full text-center px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition-colors font-medium shadow-lg shadow-indigo-500/20"
-            >
-              Sign up
-            </Link>
-          </div>
+      {/* Bottom Settings */}
+      <div className="flex flex-col gap-4">
+        <button
+          className="p-3 rounded-lg transition-all text-zinc-400 hover:text-blue-400"
+          title="Settings"
+        >
+          <Settings size={24} strokeWidth={1.5} />
+        </button>
+
+        {user && (
+          <button
+            onClick={logout}
+            className="p-3 rounded-lg transition-all text-zinc-400 hover:text-red-400"
+            title="Logout"
+          >
+            <LogOut size={24} strokeWidth={1.5} />
+          </button>
         )}
       </div>
     </aside>

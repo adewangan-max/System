@@ -3,13 +3,24 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { Plus, X, Heart } from "lucide-react";
 
 interface Post {
   id: number;
   title: string;
   content: string;
   tags: string[] | null;
+  likes: number | null;
 }
+
+const GRADIENTS = [
+  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+  "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+  "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+  "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
+  "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
+];
 
 export default function PostsPage() {
   const { user } = useAuth();
@@ -22,6 +33,7 @@ export default function PostsPage() {
     tags: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [likingPosts, setLikingPosts] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchPosts();
@@ -42,6 +54,39 @@ export default function PostsPage() {
       console.error("Error fetching posts:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLike = async (postId: number, currentLikes: number | null) => {
+    if (likingPosts.has(postId)) return; // Prevent multiple clicks
+
+    try {
+      setLikingPosts((prev) => new Set(prev).add(postId));
+
+      const newLikeCount = (currentLikes || 0) + 1;
+
+      const { error } = await supabase
+        .from("posts")
+        .update({ likes: newLikeCount })
+        .eq("id", postId);
+
+      if (error) throw error;
+
+      // Update local state
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId ? { ...post, likes: newLikeCount } : post,
+        ),
+      );
+    } catch (error) {
+      console.error("Error liking post:", error);
+      alert("Failed to like post");
+    } finally {
+      setLikingPosts((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(postId);
+        return newSet;
+      });
     }
   };
 
@@ -76,12 +121,12 @@ export default function PostsPage() {
           title: formData.title,
           content: formData.content,
           tags: tagsArray.length > 0 ? tagsArray : null,
+          likes: 0, // Initialize likes to 0 for new posts
         },
       ]);
 
       if (error) throw error;
 
-      // Reset form and refresh posts
       setFormData({ title: "", content: "", tags: "" });
       setShowForm(false);
       await fetchPosts();
@@ -94,60 +139,73 @@ export default function PostsPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <div className="bg-zinc-900/50 border-b border-zinc-800 p-6 flex justify-between items-center">
+      <div className="sticky top-0 z-20 bg-black/80 backdrop-blur border-b border-zinc-800 p-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-white">Posts</h1>
-          <p className="text-zinc-400 text-sm mt-1">Explore and create posts</p>
+          <h1 className="text-3xl font-bold">Your Posts</h1>
+          <p className="text-zinc-400 text-sm mt-1">
+            Explore and share your content
+          </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md font-medium transition-colors shadow-lg shadow-indigo-500/20"
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+            showForm
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          {showForm ? "Cancel" : "Add New Post"}
+          {showForm ? (
+            <>
+              <X size={20} /> Cancel
+            </>
+          ) : (
+            <>
+              <Plus size={20} /> New Post
+            </>
+          )}
         </button>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto p-6">
-        {/* Form */}
+      <div className="p-8">
+        {/* Form Modal */}
         {showForm && (
-          <div className="mb-8 bg-zinc-900 border border-zinc-800 rounded-lg p-6 max-w-2xl">
-            <h2 className="text-xl font-bold text-white mb-4">
+          <div className="mb-12 bg-zinc-900 border border-blue-500/30 rounded-lg p-8 max-w-2xl">
+            <h2 className="text-2xl font-bold mb-6 text-blue-400">
               Create New Post
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
-                  Title
+                <label className="block text-sm font-semibold text-zinc-300 mb-2">
+                  Post Title
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="Enter post title"
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="What's on your mind?"
+                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-semibold text-zinc-300 mb-2">
                   Content
                 </label>
                 <textarea
                   name="content"
                   value={formData.content}
                   onChange={handleInputChange}
-                  placeholder="Enter post content"
+                  placeholder="Share your thoughts..."
                   rows={6}
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-2">
+                <label className="block text-sm font-semibold text-zinc-300 mb-2">
                   Tags (comma-separated)
                 </label>
                 <input
@@ -155,60 +213,90 @@ export default function PostsPage() {
                   name="tags"
                   value={formData.tags}
                   onChange={handleInputChange}
-                  placeholder="e.g. javascript, react, next.js"
-                  className="w-full px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-md text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="e.g. tech, design, development"
+                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 text-white rounded-md font-medium transition-colors"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 text-white rounded-lg font-semibold transition-all"
               >
-                {submitting ? "Creating..." : "Create Post"}
+                {submitting ? "Publishing..." : "Publish Post"}
               </button>
             </form>
           </div>
         )}
 
-        {/* Posts List */}
+        {/* Posts Grid */}
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <p className="text-zinc-400">Loading posts...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
           </div>
         ) : posts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64">
-            <p className="text-zinc-400 text-lg">No posts yet</p>
+            <p className="text-zinc-400 text-xl">No posts yet</p>
             <p className="text-zinc-500 text-sm mt-2">
               Create your first post to get started
             </p>
           </div>
         ) : (
-          <div className="space-y-4 max-w-4xl">
-            {posts.map((post) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post, idx) => (
               <div
                 key={post.id}
-                className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-zinc-700 transition-colors"
+                className="group rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 border border-zinc-800 hover:border-zinc-700"
               >
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {post.title}
-                </h3>
-                <p className="text-zinc-300 mb-4 line-clamp-3">
-                  {post.content}
-                </p>
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 bg-indigo-900/30 text-indigo-300 text-xs rounded-full border border-indigo-800"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                <div
+                  className="w-full h-40 flex items-end p-4 relative overflow-hidden"
+                  style={{ background: GRADIENTS[idx % GRADIENTS.length] }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                  <div className="relative z-10 w-full">
+                    <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-blue-200 text-xs line-clamp-2">
+                      {post.content}
+                    </p>
                   </div>
-                )}
-                <p className="text-zinc-500 text-xs mt-4">ID: {post.id}</p>
+                </div>
+                <div className="bg-zinc-900 px-4 py-3">
+                  {post.tags && post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {post.tags.slice(0, 3).map((tag, tidx) => (
+                        <span
+                          key={tidx}
+                          className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {post.tags.length > 3 && (
+                        <span className="text-xs text-zinc-400">
+                          +{post.tags.length - 3}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
+                    <button
+                      onClick={() => handleLike(post.id, post.likes)}
+                      disabled={likingPosts.has(post.id)}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all group/like"
+                    >
+                      <Heart
+                        size={18}
+                        className="text-zinc-400 group-hover/like:text-red-500 transition-colors"
+                      />
+                      <span className="text-sm font-medium text-zinc-300">
+                        {post.likes || 0} {post.likes === 1 ? "Like" : "Likes"}
+                      </span>
+                    </button>
+                    <div className="text-xs text-zinc-500">Post #{post.id}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
