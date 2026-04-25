@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus, X, Heart } from "lucide-react";
+import Link from "next/link";
 
 interface Post {
   id: number;
@@ -139,22 +140,41 @@ export default function PostsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
+      {/* Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-violet-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-red-500/10 to-transparent rounded-full blur-3xl" />
+      </div>
+
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-black/80 backdrop-blur border-b border-zinc-800 p-6 flex justify-between items-center">
+      <div className="sticky top-0 z-20 bg-slate-950/80 backdrop-blur border-b border-white/10 p-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Your Posts</h1>
+          <h1
+            className="text-xl md:text-4xl font-bold mb-4 leading-tight tracking-tight"
+            style={{
+              backgroundImage: "url(/pageWrinkle.jpg)",
+              backgroundSize: "100%",
+              backgroundPosition: "center",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow:
+                "0 0 10px rgba(255,255,255,0.6), 0 0 16px rgba(255,255,255,0.6)",
+            }}
+          >
+            Your Posts
+          </h1>
           <p className="text-zinc-400 text-sm mt-1">
             Explore and share your content
           </p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${
-            showForm
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${showForm
               ? "bg-red-600 hover:bg-red-700"
               : "bg-blue-600 hover:bg-blue-700"
-          }`}
+            }`}
         >
           {showForm ? (
             <>
@@ -244,16 +264,23 @@ export default function PostsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {posts.map((post, idx) => (
-              <div
+              <Link
                 key={post.id}
-                className="group rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 border border-zinc-800 hover:border-zinc-700"
+                href={`/posts/${post.id}`}
+                className="group rounded-lg overflow-hidden hover:scale-105 transition-transform duration-300 border border-zinc-800 hover:border-zinc-700 block"
+                prefetch={false}
               >
                 <div
-                  className="w-full h-40 flex items-end p-4 relative overflow-hidden"
+                  className="relative w-full h-40 flex items-end p-4 overflow-hidden group"
                   style={{ background: GRADIENTS[idx % GRADIENTS.length] }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-                  <div className="relative z-10 w-full">
+                  {/* Overlay Effects */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent z-10" />
+                  {/* Shine Effect on Hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 z-20" />
+                  {/* Content */}
+                  <div className="relative z-30 w-full">
                     <h3 className="font-bold text-lg mb-2 line-clamp-2">
                       {post.title}
                     </h3>
@@ -282,7 +309,10 @@ export default function PostsPage() {
                   )}
                   <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
                     <button
-                      onClick={() => handleLike(post.id, post.likes)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleLike(post.id, post.likes);
+                      }}
                       disabled={likingPosts.has(post.id)}
                       className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all group/like"
                     >
@@ -297,7 +327,7 @@ export default function PostsPage() {
                     <div className="text-xs text-zinc-500">Post #{post.id}</div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

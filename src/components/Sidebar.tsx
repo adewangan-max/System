@@ -22,10 +22,14 @@ export default function Sidebar() {
     return null;
   }
 
-  const isActive = (path: string) => pathname === path;
+  // Highlight for exact or subroutes (e.g., /posts/123 highlights /posts)
+  const isActive = (path: string) => {
+    if (path === "/") return pathname === "/";
+    return pathname === path || pathname.startsWith(path + "/");
+  };
 
   return (
-    <aside className="w-24 bg-black flex flex-col items-center h-screen sticky top-0 border-r border-zinc-800 shadow-2xl py-6 gap-8">
+    <aside className="w-20 bg-black flex flex-col items-center h-screen sticky top-0 border-r border-zinc-800 shadow-2xl py-6 gap-8">
       {/* Logo */}
       <Link
         href="/"

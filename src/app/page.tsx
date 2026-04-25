@@ -16,7 +16,7 @@ interface ContentItem {
 const FEATURED_CONTENT: ContentItem[] = [
   {
     id: 1,
-    title: "NoBreaks TV - Featured",
+    title: "NoBrakes",
     category: "Live",
     image: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     duration: "Live",
@@ -129,7 +129,7 @@ export default function Home() {
       {/* Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-violet-500/10 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-cyan-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-red-500/10 to-transparent rounded-full blur-3xl" />
       </div>
 
       {/* Header with Time and Featured Content */}

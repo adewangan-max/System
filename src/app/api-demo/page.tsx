@@ -33,9 +33,15 @@ export default function ApiDemoPage() {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
+      {/* Background Elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-violet-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-red-500/10 to-transparent rounded-full blur-3xl" />
+      </div>
+
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-black/80 backdrop-blur border-b border-zinc-800 p-6">
+      <div className="sticky top-0 z-20 bg-slate-950/80 backdrop-blur border-b border-white/10 p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">API Explorer</h1>
