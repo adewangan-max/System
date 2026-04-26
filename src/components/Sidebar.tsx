@@ -42,11 +42,10 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-8 flex-1">
         <Link
           href="/"
-          className={`p-3 rounded-lg transition-all ${
-            isActive("/")
+          className={`p-3 rounded-lg transition-all ${isActive("/")
               ? "bg-blue-500/20 text-blue-400"
               : "text-zinc-400 hover:text-blue-400"
-          }`}
+            }`}
           title="Home"
         >
           <Home size={24} strokeWidth={1.5} />
@@ -54,11 +53,10 @@ export default function Sidebar() {
 
         <Link
           href="/posts"
-          className={`p-3 rounded-lg transition-all ${
-            isActive("/posts")
+          className={`p-3 rounded-lg transition-all ${isActive("/posts")
               ? "bg-blue-500/20 text-blue-400"
               : "text-zinc-400 hover:text-blue-400"
-          }`}
+            }`}
           title="Posts"
         >
           <Calendar size={24} strokeWidth={1.5} />
@@ -66,22 +64,16 @@ export default function Sidebar() {
 
         <Link
           href="/api-demo"
-          className={`p-3 rounded-lg transition-all ${
-            isActive("/api-demo")
+          className={`p-3 rounded-lg transition-all ${isActive("/api-demo")
               ? "bg-blue-500/20 text-blue-400"
               : "text-zinc-400 hover:text-blue-400"
-          }`}
+            }`}
           title="Explore"
         >
           <Search size={24} strokeWidth={1.5} />
         </Link>
 
-        <button
-          className="p-3 rounded-lg transition-all text-zinc-400 hover:text-pink-400"
-          title="Favorites"
-        >
-          <Heart size={24} strokeWidth={1.5} />
-        </button>
+
       </nav>
 
       {/* Bottom Settings */}

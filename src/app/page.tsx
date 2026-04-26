@@ -158,7 +158,17 @@ export default function Home() {
 
             <div className="flex items-end justify-between">
               <div className="flex-1 pr-8">
-                <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight tracking-tight">
+                <h1 className="text-6xl md:text-6xl font-extrabold mb-4 leading-tight tracking-tight"
+                  style={{
+                    backgroundImage: "url(/pageWrinkle.jpg)",
+                    backgroundSize: "100%",
+                    backgroundPosition: "center",
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    textShadow:
+                      "0 0 2px rgba(255,255,255,0.5), 0 0 8px rgba(255,255,255,0.5)",
+                  }}>
                   {FEATURED_CONTENT[0].title}
                 </h1>
                 <div className="flex items-center gap-3 text-white/90">
@@ -205,7 +215,7 @@ export default function Home() {
               Browse Content
             </h2>
           </div>
-          <div className="h-1 w-20 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" />
+          <div className="h-1 w-70 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-full" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
