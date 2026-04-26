@@ -1,0 +1,12 @@
+-> NoBK seo on google site using SEO tags 
+
+-> added seo tags 
+-> added page routing 
+-> layout.tsx, robots.ts, sitemaps.ts,
+-> added vercel analytics (vercel dashboard now have traffic stats) / vercel speed-insights
+-> SSR for server fetch server components and google fetches easily the components 
+
+
+
+To Do 
+-> connect Google ads account to website
